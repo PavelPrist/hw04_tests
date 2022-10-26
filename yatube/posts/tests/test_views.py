@@ -1,9 +1,9 @@
+from django import forms
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
-from django import forms
 
-from ..models import Post, Group
+from ..models import Group, Post
 
 User = get_user_model()
 
@@ -115,7 +115,10 @@ class PostPagesTest(TestCase):
         self.func_for_test_context(object)
 
     def test_post_with_group_on_pages_show_correct_context(self):
-        """Тест -  пост, добавленный в группу, выводится корректно на страницы."""
+        """
+        Тест -  пост, добавленный в группу,
+        выводится корректно на страницы.
+        """
         reverse_objects = [
             reverse('posts:index'),
             reverse('posts:group_list', kwargs={'slug': self.group.slug}),
