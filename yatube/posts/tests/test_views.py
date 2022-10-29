@@ -64,10 +64,10 @@ class PostPagesTest(TestCase):
         self.authorized_client.force_login(self.user)
 
     def test_pages_uses_correct_templates_authorised_user(self):
-        '''
-        Тесты namespace, проверяющие,
-        что во view-функциях используются правильные html-шаблоны.
-        '''
+        """
+        Тесты namespace, проверяющие, что во view-функциях используются
+        правильные html-шаблоны.
+        """
         for reverse_name, template in self.template_urls:
             with self.subTest(reverse_name=reverse_name):
                 response = self.authorized_client.get(reverse_name)
@@ -95,12 +95,12 @@ class PostPagesTest(TestCase):
             reverse('posts:post_edit', kwargs={'post_id': self.post.pk}))
         self.post_response_assert(response)
 
-    def func_for_test_context(self, object):
-        '''Функция для тестов верного контекста у шаблонов.'''
-        post_id = object.id
-        post_author = object.author
-        post_group = object.group
-        post_text = object.text
+    def func_for_test_context(self, objects):
+        """Функция для тестов верного контекста у шаблонов."""
+        post_id = objects.id
+        post_author = objects.author
+        post_group = objects.group
+        post_text = objects.text
         self.assertEqual(post_text, self.post.text)
         self.assertEqual(post_id, self.post.pk)
         self.assertEqual(post_author, self.post.author)
@@ -111,13 +111,12 @@ class PostPagesTest(TestCase):
         response = self.authorized_client.get(
             reverse('posts:post_detail', kwargs={'post_id': self.post.pk})
         )
-        object = response.context.get('post')
-        self.func_for_test_context(object)
+        objects = response.context.get('post')
+        self.func_for_test_context(objects)
 
     def test_post_with_group_on_pages_show_correct_context(self):
         """
-        Тест -  пост, добавленный в группу,
-        выводится корректно на страницы.
+        Тест - пост, добавленный в группу, выводится корректно на страницы.
         """
         reverse_objects = [
             reverse('posts:index'),
@@ -127,11 +126,11 @@ class PostPagesTest(TestCase):
         for reverse_name in reverse_objects:
             with self.subTest(reverse_name=reverse_name):
                 response = self.authorized_client.get(reverse_name)
-                object = response.context['page_obj'][0]
-                self.func_for_test_context(object)
+                objects = response.context['page_obj'][0]
+                self.func_for_test_context(objects)
 
     def test_post_not_in_over_group(self):
-        '''Тест НЕ_нахождения поста в чужой группе.'''
+        """Тест НЕ_нахождения поста в чужой группе."""
         reverse_name_group2 = reverse(
             'posts:group_list', kwargs={'slug': self.group2.slug})
         response = self.authorized_client.get(reverse_name_group2)
@@ -163,7 +162,7 @@ class PaginatorViewsTest(TestCase):
         self.guest_client = Client()
 
     def pagination_test_setup(self, url_params, expected_count):
-        '''Функция для тестирования шаблонов с пагинацией.'''
+        """Функция для тестирования шаблонов с пагинацией."""
         reverse_pages_names = [
             reverse('posts:index') + url_params,
             reverse(
@@ -181,9 +180,9 @@ class PaginatorViewsTest(TestCase):
                 )
 
     def test_first_page_contains_ten_records(self):
-        '''Проверка: количество постов на первой странице равно 10.'''
+        """Проверка: количество постов на первой странице равно 10."""
         self.pagination_test_setup('', NUMBER_POSTS_FIRST_PAGE)
 
     def test_second_page_contains_three_records(self):
-        '''Проверка: на второй странице должно быть три поста.'''
+        """Проверка: на второй странице должно быть три поста."""
         self.pagination_test_setup('?page=2', NUMBER_POSTS_SECOND_PAGE)

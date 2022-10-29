@@ -24,10 +24,6 @@ class PostModelTest(TestCase):
             group=cls.group
         )
 
-    def setUp(self):
-        self.post = PostModelTest.post
-        self.group = PostModelTest.group
-
     def test_models_post_have_correct_obj_names(self):
         """Проверяем, что у моделей Post, Group корректно работает __str__."""
         expected_obj_name = self.post.text[:LEN_TEXT_STR_]
@@ -50,7 +46,7 @@ class PostModelTest(TestCase):
                     post._meta.get_field(field).verbose_name, expected_value)
 
     def test_help_text(self):
-        """help_text в полях совпадает с ожидаемым."""
+        """Help_text в полях совпадает с ожидаемым."""
         field_help_texts = {
             'text': '*Введите текст поста',
             'group': 'Группа, к которой относится пост',

@@ -13,7 +13,7 @@ class StaticURLTests(TestCase):
         self.guest_client = Client()
 
     def test_homepage(self):
-        '''Проверка доступности главной страницы всем пользователям.'''
+        """Проверка доступности главной страницы всем пользователям."""
         response = self.guest_client.get('/')
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
@@ -58,37 +58,37 @@ class PostUrlTest(TestCase):
         self.authorized_user_auth.force_login(self.user_auth)
 
     def test_posts_url_available_non_authorised(self):
-        '''Проверка доступности страниц неавторизованному пользователю.'''
+        """Проверка доступности страниц неавторизованному пользователю."""
         for address in self.template_url:
             with self.subTest(address=address):
                 response = self.guest_client.get(address)
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_unexisting_page_return_notfound(self):
-        '''Тест возврата ошибки с несуществующей страницы.'''
+        """Тест возврата ошибки с несуществующей страницы."""
         response = self.guest_client.get('/unexisting_page/')
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_posts_url_available_authorised(self):
-        '''Проверка доступности страниц авторизованному пользователю.'''
+        """Проверка доступности страниц авторизованному пользователю."""
         for address in self.template_url_names:
             with self.subTest(address=address):
                 response = self.authorized_client.get(address)
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
-    def test_posts_url_authoruzed_users_correct_template(self):
-        '''
+    def test_posts_url_authorized_users_correct_template(self):
+        """
         Проверка соответствия шаблонов запросу
         авторизованного пользователя.
-        '''
+        """
         for address, template in self.template_url_names.items():
             with self.subTest(address=address):
                 response = self.authorized_client.get(address)
                 self.assertTemplateUsed(response, template)
 
     def test_posts_url_redirect_for_non_authorized_users(self):
-        '''Проверка для анонимного пользователя
-        редиректа на страницу логина со страниц post_edit, post_create.'''
+        """Проверка для анонимного пользователя
+        редиректа на страницу логина со страниц post_edit, post_create."""
 
         template_url_names = {
             '/create/': '/auth/login/?next=/create/',
@@ -101,8 +101,8 @@ class PostUrlTest(TestCase):
                 self.assertRedirects(response, template)
 
     def test_posts_url_redirect_for_authorized_users_auth(self):
-        '''Проверка для авторизованного пользователя
-        не автора поста редиректа с post_edit на сам пост.'''
+        """Проверка для авторизованного пользователя
+        не автора поста редиректа с post_edit на сам пост."""
 
         address = f'/posts/{self.post.id}/edit/'
         template = f'/posts/{self.post.id}/'

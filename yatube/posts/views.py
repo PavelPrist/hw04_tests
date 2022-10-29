@@ -36,11 +36,9 @@ def profile(request, username):
     users = get_object_or_404(User, username=username)
     posts = users.posts.all()
     page_obj = paginator_page(request, posts)
-    count = posts.count
     template = 'posts/profile.html'
     context = {
         'page_obj': page_obj,
-        'count': count,
         'author': users,
     }
     return render(request, template, context)
