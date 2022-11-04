@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from ..models import Group, Post, User
+from ..models import Group, Post
 
 User = get_user_model()
 
@@ -40,8 +40,8 @@ class PostCreateFormTests(TestCase):
 
     def test_create_post_form_valid_by_authorized_user(self):
         """
-        Тест: валидная форма create_post,
-        авторизованный пользователь создает запись в базе данных.
+        Тест: валидная форма create_post, авторизованный пользователь создает
+        запись в базе данных.
         """
         posts_count = Post.objects.count()
         form_data = {
@@ -58,7 +58,8 @@ class PostCreateFormTests(TestCase):
             reverse('posts:profile', kwargs={'username': self.user.username})
         )
         self.assertEqual(Post.objects.count(), posts_count + 1)
-        self.assertTrue(Post.objects.filter(text=form_data['text']).exists())
+        self.assertTrue(Post.objects.filter(text=form_data['text'],
+                                            group=form_data['group']).exists())
         self.asserts_func_for_tests(response, form_data)
 
     def test_post_edit_form_valid_by_authorized_user(self):
@@ -78,6 +79,7 @@ class PostCreateFormTests(TestCase):
             data=form_data,
             follow=True
         )
+        self.post.refresh_from_db()
         self.assertRedirects(
             response,
             reverse('posts:post_detail', kwargs={'post_id': self.post.id})
@@ -103,6 +105,4 @@ class PostCreateFormTests(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertEqual(Post.objects.count(), posts_count)
         redirect = '/auth/login/?next=/create/'
-        self.assertRedirects(response,redirect)
-
-
+        self.assertRedirects(response, redirect)

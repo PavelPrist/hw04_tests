@@ -21,8 +21,8 @@ class StaticURLTests(TestCase):
 class PostUrlTest(TestCase):
     @classmethod
     def setUpClass(cls):
-
         super().setUpClass()
+
         cls.user_auth = User.objects.create_user(username='NameAuth')
         cls.user = User.objects.create_user(username='NameTest')
         cls.group = Group.objects.create(
@@ -54,8 +54,13 @@ class PostUrlTest(TestCase):
         self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
-        self.authorized_user_auth = Client()
-        self.authorized_user_auth.force_login(self.user_auth)
+        self.authorized_user_not_author = Client()
+        self.authorized_user_not_author.force_login(self.user_auth)
+
+    def test_unexisting_page_return_notfound(self):
+        """Тест возврата ошибки с несуществующей страницы."""
+        response = self.guest_client.get('/unexisting_page/')
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_posts_url_available_non_authorised(self):
         """Проверка доступности страниц неавторизованному пользователю."""
@@ -64,11 +69,6 @@ class PostUrlTest(TestCase):
                 response = self.guest_client.get(address)
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
-    def test_unexisting_page_return_notfound(self):
-        """Тест возврата ошибки с несуществующей страницы."""
-        response = self.guest_client.get('/unexisting_page/')
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-
     def test_posts_url_available_authorised(self):
         """Проверка доступности страниц авторизованному пользователю."""
         for address in self.template_url_names:
@@ -76,7 +76,7 @@ class PostUrlTest(TestCase):
                 response = self.authorized_client.get(address)
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
-    def test_posts_url_authorized_users_correct_template(self):
+    def test_posts_url_authorized_users_uses_correct_template(self):
         """
         Проверка соответствия шаблонов запросу
         авторизованного пользователя.
@@ -95,10 +95,10 @@ class PostUrlTest(TestCase):
             f'/posts/{self.post.id}/edit/': '/auth/login/?next=/posts/1/edit/',
         }
 
-        for address, template in template_url_names.items():
+        for address, urls in template_url_names.items():
             with self.subTest(address=address):
                 response = self.guest_client.get(address, follow=True)
-                self.assertRedirects(response, template)
+                self.assertRedirects(response, urls)
 
     def test_posts_url_redirect_for_authorized_users_auth(self):
         """Проверка для авторизованного пользователя
@@ -106,5 +106,5 @@ class PostUrlTest(TestCase):
 
         address = f'/posts/{self.post.id}/edit/'
         template = f'/posts/{self.post.id}/'
-        response = self.authorized_user_auth.get(address, follow=True)
+        response = self.authorized_user_not_author.get(address, follow=True)
         self.assertRedirects(response, template)

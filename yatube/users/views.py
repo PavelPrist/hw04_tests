@@ -2,7 +2,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 
-from users.forms import ContactForm
+from .forms import ContactForm
 
 from .forms import CreationForm
 
@@ -31,7 +31,7 @@ def user_contact(request):
 
             # При необходимости обрабатываем данные
             # ...
-            # сохраняем объект в базу
+            # Cохраняем объект в базу.
             form.save()
 
             # Функция redirect перенаправляет пользователя

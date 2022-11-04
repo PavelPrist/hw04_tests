@@ -60,9 +60,9 @@ class PostPagesTest(TestCase):
         ]
 
     def setUp(self):
+
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
-
     def test_pages_uses_correct_templates_authorised_user(self):
         """
         Тесты namespace, проверяющие, что во view-функциях используются
@@ -127,12 +127,17 @@ class PostPagesTest(TestCase):
             with self.subTest(reverse_name=reverse_name):
                 response = self.authorized_client.get(reverse_name)
                 objects = response.context['page_obj'][0]
+                resp_obj = response.context.get('page_obj').object_list
                 self.func_for_test_context(objects)
+
+                self.assertIn(self.post, resp_obj)
 
     def test_post_not_in_over_group(self):
         """Тест НЕ_нахождения поста в чужой группе."""
         reverse_name_group2 = reverse(
-            'posts:group_list', kwargs={'slug': self.group2.slug})
+            'posts:group_list',
+            kwargs={'slug': self.group2.slug}
+        )
         response = self.authorized_client.get(reverse_name_group2)
         self.assertNotContains(response, self.post)
 
@@ -174,7 +179,7 @@ class PaginatorViewsTest(TestCase):
         ]
         for reverse_name in reverse_pages_names:
             with self.subTest(reverse_name=reverse_name):
-                response = self.client.get(reverse_name)
+                response = self.guest_client.get(reverse_name)
                 self.assertEqual(
                     len(response.context['page_obj']), expected_count
                 )

@@ -24,15 +24,17 @@ class PostModelTest(TestCase):
             group=cls.group
         )
 
-    def test_models_post_have_correct_obj_names(self):
+    def test_models_post_group_have_correct_str_objects_name(self):
         """Проверяем, что у моделей Post, Group корректно работает __str__."""
         expected_obj_name = self.post.text[:LEN_TEXT_STR_]
-        self.assertEqual(expected_obj_name, str(self.post))
+        error_message = f"Длина вывода не 15 символов"
+        self.assertEqual(expected_obj_name, self.post.__str__(), error_message)
 
         expected_obj_group_name = self.group.title
         self.assertEqual(expected_obj_group_name, str(self.group))
 
     def test_verbose_name(self):
+        """verbose_name поля title совпадает с ожидаемым."""
         post = self.post
         field_verbose = {
             'text': 'Текст поста',
